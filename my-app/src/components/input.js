@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const userInput = () => {
+const Input = () => {
   const [email, setEmail] = useState({ email: "" });
   const [files, setSelectedFiles] = useState([]);
 
@@ -18,6 +18,7 @@ const userInput = () => {
 
         const formData = new FormData();
         formData.append("email", email);
+        
         for (let i = 0; i < files.length; i++) {
             formData.append("files", files[i]);
         }
@@ -60,4 +61,4 @@ const userInput = () => {
   );
 };
 
-export default userInput;
+export default Input;
