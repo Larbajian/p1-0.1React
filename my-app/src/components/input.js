@@ -55,7 +55,7 @@ const Input = () => {
           accept=".pdf, .doc, .docx, .txt, .mp4"
           onChange={handleFileChange}
         />
-        <button type="submit">Submit</button>
+        <button type="submit">Upload</button>
       </form>
     </div>
   );
