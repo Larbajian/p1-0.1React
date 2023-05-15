@@ -40,7 +40,7 @@ const Input = () => {
 
   return (
     <div>
-      <h1>Landing Page</h1>
+      <h1>Welcome!</h1>
       <form onSubmit={handleSubmit}>
  
         <input
