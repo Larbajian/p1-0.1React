@@ -47,10 +47,14 @@ const Output = () => {
         answerToken = Auth.generateToken({ email, answerId: answer.id }, "2h");
         console.log(answerToken);
       }
-      setQuestion("");
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const newQuestion = async () => {
+    setQuestion("");
+    setAnswer("");
   };
 
   return (
@@ -80,6 +84,7 @@ const Output = () => {
             <div>
               <h3>Answer:</h3>
               <p>{answer}</p>
+              <button type="button" onClick={newQuestion}>Ask Another Question</button>
             </div>
           )}
         </div>
