@@ -1,61 +1,82 @@
 import React, { useState } from "react";
+import Auth from "../utils/auth";
+import Output from "./output";
 
 const Input = () => {
-  const [email, setEmail] = useState({ email: "" });
-  const [files, setSelectedFiles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [formState, setFormState] = useState({
+    email: "",
+    files: [],
+  });
 
-  const handleEmailChange = (event) => {
-    setEmail(event.target.value);
+  const { email, files } = formState;
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormState({
+      ...formState,
+      [name]: value,
+    });
   };
 
-  const handleFileChange = (event) => {
-    setSelectedFiles([...event.target.files]);
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (files.length > 0) {
+    console.log(formState);
 
+    try {
+      if (files.length > 0) {
+        setLoading(true);
         const formData = new FormData();
         formData.append("email", email);
-        
-        for (let i = 0; i < files.length; i++) {
-            formData.append("files", files[i]);
-        }
+        const emailToken = Auth.generateToken({ email }, "2h");
+        console.log(emailToken);
 
-        fetch("http://localhost:8000/upload", {
-            method: "POST",
-            body: formData,
+        for (let i = 0; i < files.length; i++) {
+          formData.append("files", files[i]);
+          const docToken = Auth.generateToken(
+            { email, fileId: files[i].id },
+            "2h"
+          );
+          console.log(docToken);
+        }
+        await fetch("http://localhost:8000/upload", {
+          method: "POST",
+          body: formData,
         })
-            .then((response) => response.json())
-            .then((result) => {
+          .then((response) => response.json())
+          .then((result) => {
             console.log("Success:", result);
-            })
-            .catch((error) => {
-            console.error("Error:", error);
-            });
+          });
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Error:", error);
     }
-    
+    setFormState({
+      email: "",
+      files: [],
+    });
   };
 
   return (
     <div>
       <h1>Welcome!</h1>
       <form onSubmit={handleSubmit}>
- 
         <input
           type="text"
           placeholder="Email"
           value={email}
-          onChange={handleEmailChange}
+          onChange={handleChange}
         />
-          <input
+        <input
           type="file"
           placeholder="Upload File"
+          value={files}
           accept=".pdf, .doc, .docx, .txt, .mp4"
-          onChange={handleFileChange}
+          onChange={handleChange}
         />
         <button type="submit">Upload</button>
+        {loading ? <div>Uploading!</div> : <Output />}
       </form>
     </div>
   );

@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import Auth from "../utils/auth";
+//import Input from "./input";
 
 const Output = () => {
-//***const [loading, setLoading] = useState(false);
-const [question, setQuestion] = useState({ question: "" });
-const [answer, setAnswer] = useState({ answer: "" });
+  const [loading, setLoading] = useState(false);
+  const [question, setQuestion] = useState({ question: "" });
+  const [answer, setAnswer] = useState({ answer: "" });
 
   const handleQuestionChange = (event) => {
     setQuestion(event.target.value);
@@ -11,18 +13,41 @@ const [answer, setAnswer] = useState({ answer: "" });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(question);
+
+    /*
+     emailTokenValidity = Auth.isTokenExpired(emailToken);
+    if (emailTokenValidity) {
+        console.log("Token expired");
+    } 
+    if (!emailTokenValidity) {
+    console.log("Token valid"); 
+    } 
+    */
 
     const questionData = new questionData();
     questionData.append("question", question);
+    questionToken = Auth.generateToken(
+      { email, questionId: question.id },
+      "2h"
+    );
+    console.log(questionToken);
 
     try {
-      const response = await fetch("/api/answer", {
+      setLoading(true);
+      const response = await fetch("/api/question", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: question }),
       });
-      const data = await response.json();
-      setAnswer(data.answer);
+      if (response.ok) {
+        setLoading(false);
+        const data = await response.json();
+        setAnswer(data.answer);
+        answerToken = Auth.generateToken({ email, answerId: answer.id }, "2h");
+        console.log(answerToken);
+      }
+      setQuestion("");
     } catch (error) {
       console.log(error);
     }
@@ -47,10 +72,16 @@ const [answer, setAnswer] = useState({ answer: "" });
         </div>
       )}
 
-      {answer && (
+      {loading ? (
+        <div> Loading Answer... </div>
+      ) : (
         <div>
-          <h3>Answer:</h3>
-          <p>{answer}</p>
+          {answer && (
+            <div>
+              <h3>Answer:</h3>
+              <p>{answer}</p>
+            </div>
+          )}
         </div>
       )}
     </div>
